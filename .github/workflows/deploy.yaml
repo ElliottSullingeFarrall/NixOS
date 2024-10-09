@@ -37,21 +37,18 @@ jobs:
           tags: tag:deploy
 
       - name: Setup SSH
-        run: |
-          address="$(tailscale ip -4 ${{ matrix.host }})"
-          echo "address=$address" >> "$GITHUB_ENV"
-          mkdir -p ~/.ssh
-          ssh-keyscan "$address" >> ~/.ssh/known_hosts
+        uses: Wandalen/wretry.action@v3.5.0
+        with:
+          command: | # avoid using magicDNS due to bugs
+            mkdir -p ~/.ssh
+            ipv4="$(tailscale ip -4 ${{ matrix.host }})"
+            ssh-keyscan "$ipv4" >> ~/.ssh/known_hosts
+            echo "ipv4=$ipv4" >> "$GITHUB_ENV"
 
       - name: Activate Shell
         uses: nicknovitski/nix-develop@v1
         with:
           arguments: .#deploy
-
-      - name: Run Prebuild
-        env:
-          script: systems/x86_64-linux/${{ matrix.host }}/PREBUILD.sh
-        run: type "$script" && "$script"; true
 
       - name: Checks...
         uses: poseidon/wait-for-status-checks@v0.5.0
@@ -60,34 +57,7 @@ jobs:
           ignore_pattern: deploy \(.+\)
 
       - name: Build & Deploy
-        run: |
-          deploy -s -r build \
-            --hostname ${{ env.address }} \
-            --ssh-user deploy \
-          .#${{ matrix.host}}
-
-    # - name: Upload Build
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: build
-    #     path: build/
-
-    # - name: Get Deployment
-    #   env:
-    #     GH_TOKEN: ${{ github.token }}
-    #   run: |
-    #     deploy_prev=$(gh api -X GET /repos/${{ github.repository }}/actions/workflows/deploy.yaml/runs -F status=success -F branch=${{ github.ref_name }} -F per_page=2 | jq -r '.workflow_runs[1].id')
-    #     echo "deploy_prev=$deploy_prev" >> "$GITHUB_ENV"
-
-    # - name: Download Build
-    #   uses: actions/download-artifact@v4
-    #   if: env.deploy_prev != ''
-    #   with:
-    #     name: build
-    #     run-id: ${{ env.deploy_prev }}
-    #     path: prev
-
-    # - name: Diff Builds
-    #   if: env.deploy_prev != ''
-    #   run: |
-    #     nvd diff prev/build build
+        uses: Wandalen/wretry.action@v3.5.0
+        with:
+          command: |
+            deploy -s --hostname "$ipv4" --ssh-user deploy .#${{ matrix.host }}

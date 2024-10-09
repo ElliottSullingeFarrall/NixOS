@@ -1,7 +1,6 @@
 name: Diff
 
 # TODO
-# Fix build process running out of space
 # Implement home-manager diff using
 #   https://discourse.nixos.org/t/viewing-differences-between-flake-revisions/18768/2
 
@@ -30,97 +29,50 @@ jobs:
         run: |
           echo 'hosts=["lima"]' >> "$GITHUB_OUTPUT"
 
-  old:
-    runs-on: ubuntu-latest
-    needs: check
-
-    strategy:
-      matrix:
-        host: ${{ fromJSON(needs.check.outputs.hosts) }}
-
-    steps:
-      - name: Clear Space
-        run: sudo rm -rf /usr/share /usr/local /opt || true
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v14
-        with:
-          extra-conf: accept-flake-config = true
-
-      - name: Get Commit
-        id: get_commit
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo ref="$(gh api repos/${{ github.repository }}/deployments | jq -r '.[1].sha')" >> "$GITHUB_OUTPUT"
-
-      - name: Build NixOS
-        run: |
-          nix build \
-            --out-link new \
-            github:${{ github.repository}}/${{ steps.get_commit.outputs.ref }}#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
-
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
-        with:
-          name: old
-          path: old
-
-  new:
-    runs-on: ubuntu-latest
-    needs: check
-
-    strategy:
-      matrix:
-        host: ${{ fromJSON(needs.check.outputs.hosts) }}
-
-    steps:
-      - name: Clear Space
-        run: sudo rm -rf /usr/share /usr/local /opt || true
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v14
-        with:
-          extra-conf: accept-flake-config = true
-
-      - name: Get Commit
-        id: get_commit
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo ref="$(gh api repos/${{ github.repository }}/deployments | jq -r '.[0].sha')" >> "$GITHUB_OUTPUT"
-
-      - name: Build NixOS
-        run: |
-          nix build \
-            --out-link new \
-            github:${{ github.repository}}/${{ steps.get_commit.outputs.ref }}#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
-
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
-        with:
-          name: new
-          path: new
-
   diff:
     runs-on: ubuntu-latest
-    needs:
-      - check
-      - old
-      - new
+    needs: check
 
     strategy:
       matrix:
         host: ${{ fromJSON(needs.check.outputs.hosts) }}
 
     steps:
+      - name: Clear Space
+        run: sudo rm -rf /usr/share /usr/local /opt || true
+
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v14
         with:
           extra-conf: accept-flake-config = true
 
-      - name: Download Results
-        uses: actions/download-artifact@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Activate Shell
+        uses: nicknovitski/nix-develop@v1
+        with:
+          arguments: .#deploy
+
+      - name: Get Commit
+        id: get_commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo old="$(gh api repos/${{ github.repository }}/deployments | jq -r '.[1].sha')" >> "$GITHUB_OUTPUT"
+          echo new="$(gh api repos/${{ github.repository }}/deployments | jq -r '.[0].sha')" >> "$GITHUB_OUTPUT"
+
+      - name: Build NixOS
+        uses: Wandalen/wretry.action@v3.5.0
+        with:
+          command: |
+            nix build \
+              --out-link old \
+              github:${{ github.repository}}/${{ steps.get_commit.outputs.old }}#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel &
+            nix build \
+              --out-link new \
+              github:${{ github.repository}}/${{ steps.get_commit.outputs.new }}#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel &
+            wait
 
       - name: Get Diff
-        run: nix run gitlab:khumba/nvd -- --no-write-lock-file diff old new
+        run: nvd diff old new

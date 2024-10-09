@@ -1,4 +1,4 @@
-# Auto-generated using compose2nix v0.2.4-pre.
+# Auto-generated using compose2nix v0.3.1-pre.
 { pkgs, lib, ... }:
 
 {
@@ -12,6 +12,11 @@
       dns_enabled = true;
     };
   };
+
+  # Enable container name DNS for non-default Podman networks.
+  # https://github.com/NixOS/nixpkgs/issues/226365
+  networking.firewall.interfaces."podman+".allowedUDPPorts = [ 53 ];
+
   virtualisation.oci-containers.backend = "podman";
 
   # Containers
@@ -35,7 +40,7 @@
       "traefik.enable" = "true";
       "traefik.http.routers.auth.entrypoints" = "auth";
       "traefik.http.services.auth.loadbalancer.server.port" = "9091";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -83,7 +88,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -137,7 +142,7 @@
       "kuma.broad.docker_host.connection_type" = "socket";
       "kuma.broad.docker_host.docker_daemon" = "/var/run/docker.sock";
       "kuma.services.group.name" = "services";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -206,7 +211,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -286,7 +291,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -338,7 +343,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     user = "0:0";
@@ -376,7 +381,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^v\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -423,7 +428,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.fileflows.loadbalancer.server.port" = "5000";
-      "wud.tag.include" = "^\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "false";
     };
     log-driver = "journald";
@@ -460,7 +465,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -515,7 +520,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.glances.loadbalancer.server.port" = "61208";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -582,7 +587,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.homepage.loadbalancer.server.port" = "3000";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -640,8 +645,8 @@
       "traefik.http.middlewares.theme-jellyfin.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.jellyfin.middlewares" = "theme-jellyfin";
       "traefik.http.services.jellyfin.loadbalancer.server.port" = "8096";
-      "wud.tag.exclude" = "^\\d\\d\\d\\d\\.\\d\\d\\.\\d\\d$$";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.exclude" = "^\\\\d\\\\d\\\\d\\\\d\\\\.\\\\d\\\\d\\\\.\\\\d\\\\d$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -698,7 +703,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.jellyseerr.loadbalancer.server.port" = "5055";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -780,7 +785,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.ldap.loadbalancer.server.port" = "17170";
-      "wud.tag.include" = "^\\d\\d\\d\\d-\\d\\d-\\d\\d-alpine-rootless$$";
+      "wud.tag.include" = "^\\\\d\\\\d\\\\d\\\\d-\\\\d\\\\d-\\\\d\\\\d-alpine-rootless$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -830,7 +835,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.myspeed.loadbalancer.server.port" = "5216";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -881,7 +886,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.netalertx.loadbalancer.server.port" = "20211";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -939,7 +944,7 @@
       "traefik.http.middlewares.theme-portainer.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.portainer.middlewares" = "theme-portainer";
       "traefik.http.services.portainer.loadbalancer.server.port" = "9000";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+-alpine$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+-alpine$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -993,7 +998,7 @@
       "traefik.http.middlewares.theme-prowlarr.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.prowlarr.middlewares" = "theme-prowlarr";
       "traefik.http.services.prowlarr.loadbalancer.server.port" = "9696";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1059,7 +1064,7 @@
       "traefik.http.middlewares.auth.forwardauth.authResponseHeaders" = "Remote-User,Remote-Groups,Remote-Name,Remote-Email";
       "traefik.http.middlewares.auth.forwardauth.trustForwardHeader" = "true";
       "traefik.http.services.proxy.loadbalancer.server.port" = "8080";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1120,8 +1125,8 @@
       "traefik.http.middlewares.theme-qbittorrent.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.qbittorrent.middlewares" = "theme-qbittorrent";
       "traefik.http.services.qbittorrent.loadbalancer.server.port" = "8080";
-      "wud.tag.exclude" = "^\\d\\d\\.\\d+\\.\\d+$$";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.exclude" = "^\\\\d\\\\d\\\\.\\\\d+\\\\.\\\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1179,7 +1184,7 @@
       "traefik.http.middlewares.theme-radarr.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.radarr.middlewares" = "theme-radarr";
       "traefik.http.services.radarr.loadbalancer.server.port" = "7878";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1223,7 +1228,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1287,7 +1292,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.romm.loadbalancer.server.port" = "8080";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1342,7 +1347,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1397,7 +1402,7 @@
       "traefik.http.middlewares.theme-sabnzbd.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.sabnzbd.middlewares" = "theme-sabnzbd";
       "traefik.http.services.sabnzbd.loadbalancer.server.port" = "4321";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1449,7 +1454,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.scrutiny.loadbalancer.server.port" = "8080";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+-omnibus$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+-omnibus$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1506,7 +1511,7 @@
       "traefik.http.middlewares.theme-sonarr.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.sonarr.middlewares" = "theme-sonarr";
       "traefik.http.services.sonarr.loadbalancer.server.port" = "8989";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1570,7 +1575,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.speedtest-tracker.loadbalancer.server.port" = "80";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1634,7 +1639,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.tubearchivist.loadbalancer.server.port" = "8000";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1763,7 +1768,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     dependsOn = [
@@ -1821,7 +1826,7 @@
       "traefik.http.middlewares.theme-uptime-kuma.plugin.themepark.theme" = "catppuccin-macchiato";
       "traefik.http.routers.uptime-kuma.middlewares" = "theme-uptime-kuma";
       "traefik.http.services.uptime-kuma.loadbalancer.server.port" = "3001";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1875,7 +1880,7 @@
       "io.containers.autoupdate" = "registry";
       "kuma.__internal" = "";
       "kuma.__service" = "";
-      "wud.tag.include" = "^v\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^v\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
@@ -1929,7 +1934,7 @@
       "kuma.__service" = "";
       "traefik.enable" = "true";
       "traefik.http.services.whats-up-docker.loadbalancer.server.port" = "3000";
-      "wud.tag.include" = "^\\d+\\.\\d+\\.\\d+$$";
+      "wud.tag.include" = "^\\\\d+\\\\.\\\\d+\\\\.\\\\d+$$";
       "wud.watch" = "true";
     };
     log-driver = "journald";
